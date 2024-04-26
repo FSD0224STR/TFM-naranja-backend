@@ -6,10 +6,19 @@ const userRoutes = require("./Routes/userRoutes");
 
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+const mongoDB =
+  "mongodb+srv://" +
+  process.env.DB_USER +
+  ":" +
+  process.env.DB_PASSWORD +
+  "@" +
+  process.env.DB_SERVER +
+  "/" +
+  process.env.DB_NAME +
+  "?retryWrites=true&w=majority";
 
 mongoose
-  .connect(process.env.DB_URL)
+  .connect(mongoDB)
   .then((result) => {
     console.log("MongoDB Esta connectada!");
   })
@@ -17,8 +26,9 @@ mongoose
     console.log(err);
   });
 
-app.use("/api/users", userRoutes);
+app.use(cors());
 app.use(express.json());
+app.use("/api/users", userRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
