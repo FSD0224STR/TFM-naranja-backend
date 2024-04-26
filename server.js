@@ -18,6 +18,7 @@ mongoose
   });
 
 app.use("/api/users", userRoutes);
+app.use(express.json());
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
