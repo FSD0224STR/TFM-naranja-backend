@@ -22,13 +22,18 @@ try {
 }
 
 const verifyToken = async (req, res, next) => {
-    const token = req.headers.authorization.split('')[1]
+    const token = req.headers.authorization?.split(' ')[1]
     try {
         await jwt.verify(token, tokenSecret)
     next()
     } catch (error) {
-        res.status(500).json({ error: error.message })
+        res.status(404).json({ error: error.message })
     }
+}
+
+const isAdmin = (req, res, next) => {
+    if (req.user.role === 'admin') return next()
+    res.status(400).json('No estas autorizado para ver este recurso')
 }
 
 const registerUser = async (req, res) => {
@@ -48,5 +53,6 @@ const registerUser = async (req, res) => {
 module.exports = {
     loginUser,
     registerUser,
-    verifyToken
+    verifyToken,
+    isAdmin
 }
