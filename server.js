@@ -1,13 +1,12 @@
-require('dotenv').config()
+require("dotenv").config();
 
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
-const userRoutes = require("./Routes/userRoutes");
+const { UsersRouter } = require("./Routes/userRoutes");
 
-
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 const mongoDB =
   "mongodb+srv://" +
@@ -31,8 +30,10 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
-app.use("/api/users", userRoutes);
+
+app.use("/api/users", UsersRouter);
 app.use("/api/products", productsRoutes)
+
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
