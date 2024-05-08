@@ -5,6 +5,7 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { UsersRouter } = require("./Routes/userRoutes");
+const { ProductsRouter } = require("./Routes/productsRoutes");
 
 const port = process.env.PORT || 3000;
 
@@ -32,8 +33,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", UsersRouter);
-app.use("/api/products", productsRoutes)
-
+app.use("/api/products", ProductsRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
