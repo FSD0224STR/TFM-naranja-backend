@@ -32,8 +32,8 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/users", UsersRouter);
-app.use("/api/products", ProductsRouter);
+app.use("/users", UsersRouter);
+app.use("/products", ProductsRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
