@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-const tokenSecret = process.env.TOKEN_SECRET;
+const tokenSecret = "prueba"; //process.env.TOKEN_SECRET;
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -40,13 +40,20 @@ const isAdmin = (req, res, next) => {
 
 const registerUser = async (req, res) => {
   try {
+
+    console.log("back", req.body.email);
     const tokenSecret = crypto.randomBytes(32).toString("hex");
-    const hashedPassword = await bcrypt.hash(req.body.password);
+    const hashedPassword = await bcrypt.hash(req.body.password, 12);
+    console.log("back", hashedPassword);
+
     const newUser = await userModel.create({
       email: req.body.email,
       password: hashedPassword,
       secret: tokenSecret,
     });
+
+    console.log("back", req.body.password);
+
     res.json(newUser);
   } catch (error) {
     res.status(400).json({ error: error.message });
