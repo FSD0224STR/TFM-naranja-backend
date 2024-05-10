@@ -40,16 +40,20 @@ const isAdmin = (req, res, next) => {
 
 const registerUser = async (req, res) => {
   try {
+
     console.log("back", req.body.email);
     const tokenSecret = crypto.randomBytes(32).toString("hex");
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
     console.log("back", hashedPassword);
+
     const newUser = await userModel.create({
       email: req.body.email,
       password: hashedPassword,
       secret: tokenSecret,
     });
+
     console.log("back", req.body.password);
+
     res.json(newUser);
   } catch (error) {
     res.status(400).json({ error: error.message });
