@@ -1,9 +1,9 @@
 const { userModel } = require("../Models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+/* const crypto = require("crypto"); */
 
-const tokenSecret = "prueba"; //process.env.TOKEN_SECRET;
+const tokenSecret = process.env.TOKEN_SECRET;
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -26,10 +26,11 @@ const loginUser = async (req, res) => {
 const verifyToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
   try {
-    await jwt.verify(token, tokenSecret);
+    const decodedToken = jwt.verify(token, tokenSecret);
+    req.user = decodedToken;
     next();
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(403).json({ error: error.message });
   }
 };
 
@@ -40,9 +41,8 @@ const isAdmin = (req, res, next) => {
 
 const registerUser = async (req, res) => {
   try {
-
     console.log("back", req.body.email);
-    const tokenSecret = crypto.randomBytes(32).toString("hex");
+    /*     const tokenSecret = crypto.randomBytes(32).toString("hex"); */
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
     console.log("back", hashedPassword);
 
