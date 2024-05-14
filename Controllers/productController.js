@@ -18,7 +18,7 @@ const findProduct = async (req, res) => {
   }
 
   try {
-    const product = await productModel.find({ status: { $ne: "DONE" } });
+    const product = await productModel.find({});
     res.status(200).json({ data: product });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -138,6 +138,11 @@ const deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  try {
     await productModel.findByIdAndDelete(id);
     res.status(200).json({ data: "Product removed successfully" });
   } catch (error) {
