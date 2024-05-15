@@ -13,15 +13,15 @@ const { verifyToken } = require("../Controllers/userController");
 
 const ProductsRouter = express.Router();
 
-//ProductsRouter.use(verifyToken);
+ProductsRouter.use(verifyToken);
 
-ProductsRouter.get("/category/:category", verifyToken, findProductsByCategory);
+ProductsRouter.get("/category/:category", findProductsByCategory);
 
-ProductsRouter.get("/", verifyToken, findProduct);
-ProductsRouter.post("/", verifyToken, addProduct);
-ProductsRouter.put("/:id", verifyToken, updateProduct);
-ProductsRouter.delete("/:id", verifyToken, deleteProduct);
-ProductsRouter.get("/:id", verifyToken, findProductById);
+ProductsRouter.get("/", findProduct);
+ProductsRouter.post("/", addProduct);
+ProductsRouter.put("/:id", updateProduct);
+ProductsRouter.delete("/:id", deleteProduct);
+ProductsRouter.get("/:id", findProductById);
 
 module.exports = {
   ProductsRouter,
