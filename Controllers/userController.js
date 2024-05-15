@@ -113,10 +113,28 @@ const deleteUser = async (req, res) => {
 >>>>>>> d30d72e29671793a769b85ea86da05b8ea44a448
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const { name, password } = req.body
+        const userToUpdate = await userModel.findById (req.params.id);
+        if (!userToUpdate) {
+            return res.status(404).json({ error: "Usuario no encontrado"})
+        }
+        if (name) userToUpdate.name = name;
+        if (password) {
+            const hashedPassword = await bcrypt.hash (password, 10);
+            userToUpdate.password = hashedPassword;
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
   loginUser,
   registerUser,
   verifyToken,
   isAdmin,
   deleteUser,
+  updateUser,
 };

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const productSchema = new mongoose.Schema(
   {
     product: String,
+    category: { type: mongoose.Schema.Types, ref: "Category" },
     description: String,
     price: Number,
     origin: String,
@@ -15,5 +16,5 @@ const productSchema = new mongoose.Schema(
 const productModel = mongoose.model("Product", productSchema);
 
 module.exports = {
-  productModel
+  productModel,
 };
