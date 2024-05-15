@@ -60,9 +60,35 @@ const registerUser = async (req, res) => {
   }
 };
 
+const deleteUser = async (req, res) => {
+  try {
+    const isAdmin = req.user.isAdmin;
+
+    const userIdToDelete = req.params.id;
+
+    const userToDelete = await userModel.findById(userIdToDelete);
+
+    if (!userToDelete) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    if (isAdmin || userIdToDelete === req.user._id) {
+      await userToDelete.remove();
+      res.status(200).json({ message: "Usuario eliminado exitosamente" });
+    } else {
+      return res
+        .status(403)
+        .json({ error: "No tienes permiso para realizar esta acción" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   loginUser,
   registerUser,
   verifyToken,
   isAdmin,
+  deleteUser,
 };
