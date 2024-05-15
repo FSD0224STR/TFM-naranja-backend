@@ -145,10 +145,27 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const findProductsByCategory = async (req, res) => {
+  try {
+    //const decodedToken = jwt.verify(token, tokenSecret);
+    const targetCategory = req.params.category;
+
+    const result = (await productModel.populate("Category")).find({
+      category: { category: targetCategory },
+    });
+    res.json(result);
+  } catch (error) {
+    return res
+      .status(403)
+      .json({ error: "Token verification failed: " + error.message });
+  }
+};
+
 module.exports = {
   findProduct,
   findProductById,
   addProduct,
   updateProduct,
   deleteProduct,
+  findProductsByCategory,
 };

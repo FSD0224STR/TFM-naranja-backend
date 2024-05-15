@@ -6,11 +6,16 @@ const {
   updateProduct,
   deleteProduct,
   findProductById,
+  findProductsByCategory,
 } = require("../Controllers/productController");
 
 const { verifyToken } = require("../Controllers/userController");
 
 const ProductsRouter = express.Router();
+
+//ProductsRouter.use(verifyToken);
+
+ProductsRouter.get("/category/:category", verifyToken, findProductsByCategory);
 
 ProductsRouter.get("/", verifyToken, findProduct);
 ProductsRouter.post("/", verifyToken, addProduct);
