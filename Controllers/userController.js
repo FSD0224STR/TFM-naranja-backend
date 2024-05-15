@@ -2,12 +2,19 @@ const { userModel } = require("../Models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 /* const crypto = require("crypto"); */
-
+const recaptchaSecretKey = process.env.RECAPTCHA_SECRET_KEY;
 const tokenSecret = process.env.TOKEN_SECRET;
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
+
+      const recaptchaResponse = req.body.recaptchaResponse;
+    const captchaValidationResult = await verifyRecaptcha(recaptchaResponse);
+
+    if (!captchaValidationResult.success) {
+      return res.status(400).json({ error: 'Invalid CAPTCHA response' });
+    }
     const userFound = await userModel.findOne({ email: email });
     if (!userFound) return res.status(404).json("User not found");
 
@@ -41,6 +48,12 @@ const isAdmin = (req, res, next) => {
 
 const registerUser = async (req, res) => {
   try {
+      const recaptchaResponse = req.body.recaptchaResponse;
+    const captchaValidationResult = await verifyRecaptcha(recaptchaResponse);
+    
+    if (!captchaValidationResult.success) {
+        return res.status(400).json({ error: 'Invalid CAPTCHA response' });
+    }
     console.log("back", req.body.email);
     /*     const tokenSecret = crypto.randomBytes(32).toString("hex"); */
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
@@ -60,6 +73,20 @@ const registerUser = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+const verifyRecaptcha = async (recaptchaResponse) => {
+    const response = await axios.post(
+        'https://www.google.com/recaptcha/api/siteverify',
+        null,
+        {
+            params: {
+                secret: recaptchaSecretKey,
+                response: recaptchaResponse,
+            },
+        }
+    );
+    return response.data;
+=======
 const deleteUser = async (req, res) => {
   try {
     const isAdmin = req.user.isAdmin;
@@ -83,6 +110,7 @@ const deleteUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+>>>>>>> d30d72e29671793a769b85ea86da05b8ea44a448
 };
 
 module.exports = {
