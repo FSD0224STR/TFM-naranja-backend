@@ -5,6 +5,8 @@ const {
   verifyToken,
   registerUser,
   isAdmin,
+  deleteUser,
+  updateUser,
 } = require("../Controllers/userController");
 const UsersRouter = express.Router();
 
@@ -14,6 +16,7 @@ UsersRouter.post("/login", loginUser);
 //UsersRouter.get("/:user_id", verifyToken, showDashboard);
 //UsersRouter.put("/:user_id", verifyToken, editUserData);
 UsersRouter.delete("/:user_id", verifyToken, isAdmin, deleteUser);
+UsersRouter.put("/:user_id", updateUser)
 
 module.exports = {
   UsersRouter,
