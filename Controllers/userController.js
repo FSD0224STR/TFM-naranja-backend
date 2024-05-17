@@ -87,16 +87,12 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const { name, password } = req.body
         const userToUpdate = await userModel.findById (req.params.id);
         if (!userToUpdate) {
             return res.status(404).json({ error: "Usuario no encontrado"})
         }
-        if (name) userToUpdate.name = name;
-        if (password) {
-            const hashedPassword = await bcrypt.hash (password, 10);
-            userToUpdate.password = hashedPassword;
-        }
+        await userToUpdate.findByIdAndUpdate(id, req.body);;
+        res.json({ message: "Usuario actualizado correctamente", user: userToUpdate });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
