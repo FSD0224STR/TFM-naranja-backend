@@ -1,45 +1,30 @@
 require("dotenv").config();
 
 const { productModel } = require("../Models/productModel");
+const { allergensModel } = require("../Models/allergensModel");
+const { ingredientsModel } = require("../Models/ingredientsModel");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 const tokenSecret = process.env.TOKEN_SECRET;
 
 const findProduct = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
   try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
-
-  try {
-    const product = await productModel.find({});
-    res.status(200).json({ data: product });
+    const products = await productModel.find({});
+    if (products.length === 0) {
+      return res.status(404).json({ error: "Products not found" });
+    }
+    res.status(200).json({ data: products });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 const findProductById = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
-
   const { id } = req.params;
   try {
     const product = await productModel.findById(id);
-    if (!product) {
+    if (product.length === 0) {
       return res.status(404).json({ error: "Product not found" });
     }
     res.status(200).json({ data: product });
@@ -49,16 +34,6 @@ const findProductById = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
-
   const { product, description, price, origin, brand, allergens, ingredients } =
     req.body;
 
@@ -86,16 +61,6 @@ const addProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
-
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -104,7 +69,7 @@ const updateProduct = async (req, res) => {
 
   try {
     const product = await productModel.findById(id);
-    if (!product) {
+    if (product.length === 0) {
       return res.status(404).json({ error: "Product not found" });
     }
   } catch (error) {
@@ -121,16 +86,6 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
-
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -139,7 +94,7 @@ const deleteProduct = async (req, res) => {
 
   try {
     const product = await productModel.findById(id);
-    if (!product) {
+    if (product.length === 0) {
       return res.status(404).json({ error: "Product not found" });
     }
   } catch (error) {
@@ -156,7 +111,6 @@ const deleteProduct = async (req, res) => {
 
 const findProductsByCategory = async (req, res) => {
   try {
-    //const decodedToken = jwt.verify(token, tokenSecret);
     const targetCategory = req.params.category;
 
     const result = (await productModel.populate("Category")).find({
@@ -170,6 +124,32 @@ const findProductsByCategory = async (req, res) => {
   }
 };
 
+const findAllergens = async (req, res) => {
+  try {
+    const allergens = await allergensModel.find({});
+
+    if (allergens.length === 0) {
+      return res.status(404).json({ error: "Allergens not found" });
+    }
+    res.status(200).json({ data: allergens });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const findIngredients = async (req, res) => {
+  try {
+    const ingredients = await ingredientsModel.find({});
+
+    if (ingredients.length === 0) {
+      return res.status(404).json({ error: "Ingredients not found" });
+    }
+    res.status(200).json({ data: ingredients });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   findProduct,
   findProductById,
@@ -177,4 +157,6 @@ module.exports = {
   updateProduct,
   deleteProduct,
   findProductsByCategory,
+  findAllergens,
+  findIngredients,
 };
