@@ -7,7 +7,7 @@ const ingredientsSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-const ingredientsModel = mongoose.model("Ingredient", ingredientsSchema);
+const ingredientsModel = mongoose.model("Ingredients", ingredientsSchema);
 
 module.exports = {
   ingredientsModel,

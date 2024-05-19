@@ -3,6 +3,7 @@ require("dotenv").config();
 const { productModel } = require("../Models/productModel");
 const { allergensModel } = require("../Models/allergensModel");
 const { ingredientsModel } = require("../Models/ingredientsModel");
+const { originModel } = require("../Models/originModel");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
@@ -124,6 +125,19 @@ const findProductsByCategory = async (req, res) => {
   }
 };
 
+const findOrigin = async (req, res) => {
+  try {
+    const origin = await originModel.find({});
+
+    if (origin.length === 0) {
+      return res.status(404).json({ error: "Origin product not found" });
+    }
+    res.status(200).json({ data: origin });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const findAllergens = async (req, res) => {
   try {
     const allergens = await allergensModel.find({});
@@ -157,6 +171,7 @@ module.exports = {
   updateProduct,
   deleteProduct,
   findProductsByCategory,
+  findOrigin,
   findAllergens,
   findIngredients,
 };
