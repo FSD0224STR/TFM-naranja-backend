@@ -5,10 +5,8 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 const tokenSecret = process.env.TOKEN_SECRET;
-
-const findProduct = async (req, res) => {
+const validateToken = (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
-
   try {
     const decodedToken = jwt.verify(token, tokenSecret);
   } catch (error) {
@@ -16,7 +14,10 @@ const findProduct = async (req, res) => {
       .status(403)
       .json({ error: "Token verification failed: " + error.message });
   }
+};
 
+const findProduct = async (req, res) => {
+  validateToken(req, res);
   try {
     const product = await productModel.find({});
     res.status(200).json({ data: product });
@@ -26,15 +27,7 @@ const findProduct = async (req, res) => {
 };
 
 const findProductById = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
+  validateToken(req, res);
 
   const { id } = req.params;
   try {
@@ -49,15 +42,7 @@ const findProductById = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
+  validateToken(req, res);
 
   const { product, description, price, origin, brand, allergens, ingredients } =
     req.body;
@@ -86,15 +71,7 @@ const addProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
+  validateToken(req, res);
 
   const { id } = req.params;
 
@@ -121,15 +98,7 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
-
-  try {
-    const decodedToken = jwt.verify(token, tokenSecret);
-  } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
-  }
+  validateToken(req, res);
 
   const { id } = req.params;
 
@@ -170,6 +139,25 @@ const findProductsByCategory = async (req, res) => {
   }
 };
 
+const findProducts = async (req, res) => {
+  validateToken(req, res);
+
+  const { ids } = req.params;
+  try {
+    const products = await productModel
+      .find({
+        _id: { $in: ids.map((id) => new mongoose.ObjectId(id)) },
+      })
+      .toArray();
+    if (!products) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    res.status(200).json({ data: products });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   findProduct,
   findProductById,
@@ -177,4 +165,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   findProductsByCategory,
+  findProducts,
 };
