@@ -159,6 +159,21 @@ const findIngredients = async (req, res) => {
       return res.status(404).json({ error: "Ingredients not found" });
     }
     res.status(200).json({ data: ingredients });
+
+const findProducts = async (req, res) => {
+  validateToken(req, res);
+
+  const { ids } = req.params;
+  try {
+    const products = await productModel
+      .find({
+        _id: { $in: ids.map((id) => new mongoose.ObjectId(id)) },
+      })
+      .toArray();
+    if (!products) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    res.status(200).json({ data: products });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -174,4 +189,5 @@ module.exports = {
   findOrigin,
   findAllergens,
   findIngredients,
+  findProducts,
 };
