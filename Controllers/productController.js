@@ -159,10 +159,12 @@ const findIngredients = async (req, res) => {
       return res.status(404).json({ error: "Ingredients not found" });
     }
     res.status(200).json({ data: ingredients });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 const findProducts = async (req, res) => {
-  validateToken(req, res);
-
   const { ids } = req.params;
   try {
     const products = await productModel
