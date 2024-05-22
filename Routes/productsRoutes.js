@@ -7,6 +7,9 @@ const {
   deleteProduct,
   findProductById,
   findProductsByCategory,
+  findOrigin,
+  findAllergens,
+  findIngredients,
 } = require("../Controllers/productController");
 
 const { verifyToken } = require("../Controllers/userController");
@@ -17,6 +20,9 @@ ProductsRouter.use(verifyToken);
 
 ProductsRouter.get("/category/:category", findProductsByCategory);
 
+ProductsRouter.get("/origin", findOrigin);
+ProductsRouter.get("/allergens", findAllergens);
+ProductsRouter.get("/ingredients", findIngredients);
 ProductsRouter.get("/", findProduct);
 ProductsRouter.post("/", addProduct);
 ProductsRouter.put("/:id", updateProduct);

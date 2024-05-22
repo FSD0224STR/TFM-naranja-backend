@@ -86,16 +86,25 @@ const deleteUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    try {
-        const userToUpdate = await userModel.findById (req.params.id);
-        if (!userToUpdate) {
-            return res.status(404).json({ error: "Usuario no encontrado"})
-        }
-        await userToUpdate.findByIdAndUpdate(id, req.body);;
-        res.json({ message: "Usuario actualizado correctamente", user: userToUpdate });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+  const { id } = req.params;
+  try {
+    const userToUpdate = await userModel.findById(id);
+    if (!userToUpdate) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+  try {
+    await userModel.findByIdAndUpdate(id, req.body);
+    res.json({
+      message: "Usuario actualizado correctamente",
+      user: userToUpdate,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 module.exports = {
