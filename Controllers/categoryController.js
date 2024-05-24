@@ -1,15 +1,15 @@
+const mongoose = require("mongoose");
 const { categoryModel } = require("../Models/categoryModel");
 
 const findCategories = async (req, res) => {
   try {
-    //const decodedToken = jwt.verify(token, tokenSecret);
-
-    const result = await categoryModelModel.find({}).toArray();
-    res.json(result);
+    const categories = await categoryModel.find({});
+    if (categories.length === 0) {
+      return res.status(404).json({ error: "Categories not found" });
+    }
+    res.status(200).json({ data: categories });
   } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 

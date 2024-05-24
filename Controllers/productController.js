@@ -1,13 +1,9 @@
-require("dotenv").config();
-
 const { productModel } = require("../Models/productModel");
 const { allergensModel } = require("../Models/allergensModel");
 const { ingredientsModel } = require("../Models/ingredientsModel");
 const { originModel } = require("../Models/originModel");
-const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-
-const tokenSecret = process.env.TOKEN_SECRET;
+const { brandModel } = require("../Models/brandModel");
 
 const findProduct = async (req, res) => {
   try {
@@ -182,6 +178,19 @@ const findProducts = async (req, res) => {
   }
 };
 
+const findBrand = async (req, res) => {
+  try {
+    const brand = await brandModel.find({});
+
+    if (brand.length === 0) {
+      return res.status(404).json({ error: "Brand product not found" });
+    }
+    res.status(200).json({ data: brand });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   findProduct,
   findProductById,
@@ -193,4 +202,5 @@ module.exports = {
   findAllergens,
   findIngredients,
   findProducts,
+  findBrand,
 };
