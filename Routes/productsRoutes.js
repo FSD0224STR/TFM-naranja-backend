@@ -10,6 +10,7 @@ const {
   findOrigin,
   findAllergens,
   findIngredients,
+  findBrand,
 } = require("../Controllers/productController");
 
 const { verifyToken } = require("../Controllers/userController");
@@ -20,6 +21,7 @@ ProductsRouter.use(verifyToken);
 
 ProductsRouter.get("/category/:category", findProductsByCategory);
 
+ProductsRouter.get("/brand", findBrand);
 ProductsRouter.get("/origin", findOrigin);
 ProductsRouter.get("/allergens", findAllergens);
 ProductsRouter.get("/ingredients", findIngredients);
