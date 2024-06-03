@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("../server.js");
+const mockUser = {};
 
 describe("users test suite", () => {
   test("Jest is working", () => {
