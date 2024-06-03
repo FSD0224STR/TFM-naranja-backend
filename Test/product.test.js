@@ -54,20 +54,19 @@ describe("ProductsRouter tests", () => {
 
 import request from "supertest";
 import express from "express";
-import { ProductsRouter } from "../path/to/your/router"; // Ajusta la ruta según corresponda
-
+import { ProductsRouter } from "../path/to/your/router";
 describe("ProductsRouter POST tests", () => {
   let app;
 
   beforeEach(() => {
     const expressApp = express();
-    expressApp.use(express.json()); // Asegúrate de que tu aplicación Express use express.json()
-    expressApp.use("/", ProductsRouter); // Usa el router en tu aplicación Express
+    expressApp.use(express.json());
+    expressApp.use("/", ProductsRouter);
     app = expressApp;
   });
 
   afterEach(() => {
-    jest.resetAllMocks(); // Reinicia los mocks después de cada prueba
+    jest.resetAllMocks();
   });
 
   it("should create a new product successfully", async () => {
