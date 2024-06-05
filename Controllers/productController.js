@@ -5,7 +5,7 @@ const { originModel } = require("../Models/originModel");
 const mongoose = require("mongoose");
 const { brandModel } = require("../Models/brandModel");
 
-const findProduct = async (req, res) => {
+const findAllProduct = async (req, res) => {
   try {
     const products = await productModel.find({});
     if (products.length === 0) {
@@ -16,6 +16,47 @@ const findProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+const findProducts = async (req, res) => {
+  try {
+    const searchTerm = req.query.searchTerm;
+
+    if (!searchTerm) {
+      return res.status(400).json({ error: "Search term is required" });
+    }
+
+    const isNumeric = !isNaN(searchTerm);
+    const regex = new RegExp(`\\b${searchTerm}\\b`, "i");
+
+    if (isNumeric) {
+      products = await productModel.find({ price: searchTerm });
+    } else {
+      products = await productModel.find({
+        $or: [
+        { description: regex },
+        { product: regex },
+        { brand: regex  },
+        { origin: regex },
+        { allergens: { $elemMatch: { $regex: regex } } },
+        { ingredients: { $elemMatch: { $regex: regex } } }
+        ]
+      });
+    }
+
+    console.log(products)
+
+    if (products.length === 0) {
+      return res.status(404).json({ error: "Products not found" });
+    }
+
+    console.log('que es esto3')
+    res.status(200).json({ data: products });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 
 const findProductById = async (req, res) => {
   const { id } = req.params;
@@ -160,7 +201,7 @@ const findIngredients = async (req, res) => {
   }
 };
 
-const findProducts = async (req, res) => {
+const findProduct = async (req, res) => {
   const { ids } = req.params;
   try {
     const products = await productModel
@@ -191,7 +232,8 @@ const findBrand = async (req, res) => {
 };
 
 module.exports = {
-  findProduct,
+  findAllProduct,
+  findProducts,
   findProductById,
   addProduct,
   updateProduct,
@@ -200,6 +242,6 @@ module.exports = {
   findOrigin,
   findAllergens,
   findIngredients,
-  findProducts,
+  findProduct,
   findBrand,
 };
