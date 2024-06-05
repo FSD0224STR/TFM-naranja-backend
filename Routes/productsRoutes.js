@@ -27,7 +27,7 @@ ProductsRouter.get("/origin", findOrigin);
 ProductsRouter.get("/allergens", findAllergens);
 ProductsRouter.get("/ingredients", findIngredients);
 ProductsRouter.get("/", findAllProduct);
-ProductsRouter.get("/", findProducts);
+ProductsRouter.get("/search", findProducts);
 ProductsRouter.post("/", addProduct);
 ProductsRouter.put("/:id", updateProduct);
 ProductsRouter.delete("/:id", deleteProduct);
