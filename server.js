@@ -7,6 +7,7 @@ const cors = require("cors");
 const { UsersRouter } = require("./Routes/userRoutes");
 const { ProductsRouter } = require("./Routes/productsRoutes");
 const { CategoriesRouter } = require("./Routes/categoryRoutes");
+const { ImagesRouter } = require("./Routes/uploadRoutes");
 
 const port = process.env.PORT || 3000;
 
@@ -36,6 +37,7 @@ app.use(express.json());
 app.use("/users", UsersRouter);
 app.use("/products", ProductsRouter);
 app.use("/categories", CategoriesRouter);
+app.use("/images", ImagesRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
