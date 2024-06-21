@@ -33,30 +33,28 @@ const findProducts = async (req, res) => {
     } else {
       products = await productModel.find({
         $or: [
-        { description: regex },
-        { product: regex },
-        { brand: regex  },
-        { origin: regex },
-        { allergens: { $elemMatch: { $regex: regex } } },
-        { ingredients: { $elemMatch: { $regex: regex } } }
-        ]
+          { description: regex },
+          { product: regex },
+          { brand: regex },
+          { origin: regex },
+          { allergens: { $elemMatch: { $regex: regex } } },
+          { ingredients: { $elemMatch: { $regex: regex } } },
+        ],
       });
     }
 
-    console.log(products)
+    console.log(products);
 
     if (products.length === 0) {
       return res.status(404).json({ error: "Products not found" });
     }
 
-    console.log('que es esto3')
+    console.log("que es esto3");
     res.status(200).json({ data: products });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 const findProductById = async (req, res) => {
   const { id } = req.params;
@@ -204,13 +202,11 @@ const findIngredients = async (req, res) => {
 const findProduct = async (req, res) => {
   const { ids } = req.params;
   try {
-    const products = await productModel
-      .find({
-        _id: { $in: ids.map((id) => new mongoose.ObjectId(id)) },
-      })
-      .toArray();
-    if (!products) {
-      return res.status(404).json({ error: "Product not found" });
+    const products = await productModel.find({
+      _id: { $in: ids.map((id) => new mongoose.ObjectId(id)) },
+    });
+    if (!products.length) {
+      return res.status(404).json({ error: "Products not found" });
     }
     res.status(200).json({ data: products });
   } catch (error) {
