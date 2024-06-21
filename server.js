@@ -33,7 +33,10 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
-app.use("/", ProductsRouter);
+app.get("/", (req, res) => {
+  res.send("Hello, world!");
+});
+
 app.use("/users", UsersRouter);
 app.use("/products", ProductsRouter);
 app.use("/categories", CategoriesRouter);
