@@ -1,7 +1,8 @@
 const express = require("express");
 
 const {
-  findProduct,
+  findProducts,
+  findAllProduct,
   addProduct,
   updateProduct,
   deleteProduct,
@@ -25,7 +26,8 @@ ProductsRouter.get("/brand", findBrand);
 ProductsRouter.get("/origin", findOrigin);
 ProductsRouter.get("/allergens", findAllergens);
 ProductsRouter.get("/ingredients", findIngredients);
-ProductsRouter.get("/", findProduct);
+ProductsRouter.get("/", findAllProduct);
+ProductsRouter.get("/search", findProducts);
 ProductsRouter.post("/", addProduct);
 ProductsRouter.put("/:id", updateProduct);
 ProductsRouter.delete("/:id", deleteProduct);
