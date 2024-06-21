@@ -9,6 +9,7 @@ const { ProductsRouter } = require("./Routes/productsRoutes");
 const { CategoriesRouter } = require("./Routes/categoryRoutes");
 
 const port = process.env.PORT || 3000;
+const SECRET_KEY = '6Lelgf4pAAAAAI60WioxReT7EydWWJ-4jUKkGDXH';
 
 const mongoDB =
   "mongodb+srv://" +
