@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, require: true },
     birthday: { type: Date, require: false },
     isAdmin: Boolean,
+    image: String,
   },
   { timestamps: true }
 );
