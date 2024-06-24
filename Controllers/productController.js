@@ -7,7 +7,7 @@ const { brandModel } = require("../Models/brandModel");
 
 const findAllProduct = async (req, res) => {
   try {
-    const products = await productModel.find({});
+    const products = await productModel.find({}).sort({ createdAt: -1 });
     if (products.length === 0) {
       return res.status(404).json({ error: "Products not found" });
     }
@@ -149,9 +149,11 @@ const findProductsByCategory = async (req, res) => {
   try {
     const targetCategory = req.params.category;
 
-    const result = (await productModel.populate("Category")).find({
-      category: { category: targetCategory },
-    });
+    const result = (await productModel.populate("Category"))
+      .find({
+        category: { category: targetCategory },
+      })
+      .sort({ createdAt: -1 });
     res.json(result);
   } catch (error) {
     return res

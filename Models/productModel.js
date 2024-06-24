@@ -10,6 +10,7 @@ const productSchema = new mongoose.Schema(
     brand: String,
     allergens: Array,
     ingredients: Array,
+    images: Array,
   },
   { timestamps: true }
 );
