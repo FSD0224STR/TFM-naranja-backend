@@ -1,6 +1,17 @@
 const { userModel } = require("../Models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "orangefsd@gmail.com",
+    pass: process.env.EMAIL_APP_PASS,
+  },
+});
 /* const crypto = require("crypto"); */
 
 const tokenSecret = process.env.TOKEN_SECRET;
