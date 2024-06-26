@@ -64,7 +64,20 @@ const registerUser = async (req, res) => {
     });
 
     console.log("back", req.body.password);
-
+    //send confirmation email
+    const mailOptions = {
+      from: "orangefsd@gmail.com",
+      to: req.body.email,
+      subject: "Hello from Nodemailer",
+      text: "This is a test email sent using Nodemailer.",
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email: ", error);
+      } else {
+        console.log("Email sent: ", info.response);
+      }
+    });
     res.json(newUser);
   } catch (error) {
     res.status(400).json({ error: error.message });
