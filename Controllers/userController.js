@@ -68,8 +68,77 @@ const registerUser = async (req, res) => {
     const mailOptions = {
       from: "orangefsd@gmail.com",
       to: req.body.email,
-      subject: "Hello from Nodemailer",
+      subject: "Tu cuenta ha sido creada con éxito",
       text: "This is a test email sent using Nodemailer.",
+      html: `<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Registro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #4CAF50;
+            color: #ffffff;
+            padding: 10px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: #ffffff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>¡Bienvenido a [Nombre de la Web]!</h1>
+        </div>
+        <div class="content">
+            <p>Hola,</p>
+            <p>Gracias por registrarte. Estamos emocionados de tenerte con nosotros.</p>
+            <p>Por favor, confirma tu correo electrónico haciendo clic en el botón de abajo:</p>
+            <a href="[URL de Confirmación]" class="button">Confirmar Correo Electrónico</a>
+            <p>Si no te registraste en [Nombre de la Web], por favor ignora este correo.</p>
+            <p>¡Esperamos que disfrutes de nuestros servicios!</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2024 Comparator40k. Todos los derechos reservados.</p>
+            <p>OrangeFSD2024</p>
+        </div>
+    </div>
+</body>
+</html>`,
     };
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
