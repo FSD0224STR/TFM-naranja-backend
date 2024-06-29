@@ -7,11 +7,13 @@ const {
   isAdmin,
   deleteUser,
   updateUser,
+  verifyAdmin,
 } = require("../Controllers/userController");
 const UsersRouter = express.Router();
 
 UsersRouter.post("/register", registerUser);
 UsersRouter.post("/login", loginUser);
+UsersRouter.post("/verifyAdmin", verifyAdmin);
 
 UsersRouter.use(verifyToken);
 
