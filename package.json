@@ -23,7 +23,8 @@
     "node-fetch": "^2.7.0",
     "socket.io": "^4.7.5",
     "uuid": "^10.0.0",
-    "uuidv4": "^6.2.13"
+    "uuidv4": "^6.2.13",
+    "nodemailer": "^6.9.14"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
