@@ -7,11 +7,17 @@ const {
   isAdmin,
   deleteUser,
   updateUser,
+  forgotPass,
+  resetPass,
+  mailResetPass,
 } = require("../Controllers/userController");
 const UsersRouter = express.Router();
 
+UsersRouter.post("/forgot", forgotPass);
 UsersRouter.post("/register", registerUser);
 UsersRouter.post("/login", loginUser);
+UsersRouter.post("/reset-password/:id/:token", mailResetPass);
+UsersRouter.get("/reset-password/:id/:token", resetPass);
 
 UsersRouter.use(verifyToken);
 
