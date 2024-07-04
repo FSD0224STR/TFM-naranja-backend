@@ -89,6 +89,8 @@ const configSocket = (io) => {
         });
         activeRooms = activeRooms.filter((r) => r !== room);
       }
+      // console.log("activeRooms-disc: ", activeRooms);
+      // console.log("activeAdmins-disc: ", activeAdmins);
     });
 
     socket.on("disconnect", () => {
