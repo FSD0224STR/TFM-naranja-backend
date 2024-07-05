@@ -165,17 +165,20 @@ const deleteProduct = async (req, res) => {
 const findProductsByCategory = async (req, res) => {
   try {
     const targetCategory = req.params.category;
+    console.log("request de category", targetCategory);
 
-    const result = (await productModel.populate("Category"))
+    const result = await productModel
       .find({
-        category: { category: targetCategory },
+        category: targetCategory,
       })
-      .sort({ createdAt: -1 });
-    res.json(result);
+      .populate("category")
+      .sort({ createAt: -1 })
+      .exec();
+    console.log("request de result", result);
+
+    res.status(200).json({ data: result });
   } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
