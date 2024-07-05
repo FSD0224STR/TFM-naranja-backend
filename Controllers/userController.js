@@ -211,20 +211,13 @@ const forgotPass = async (req, res) => {
     const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
       expiresIn: "5m",
     });
-    const link = `http://localhost:5000/reset-password/${oldUser._id}/${token}`;
-    var transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: "adarsh438tcsckandivali@gmail.com",
-        pass: "rmdklolcsmswvyfw",
-      },
-    });
+    const link = `http://localhost:3000/reset-password/${oldUser._id}/${token}`;
 
-    var mailOptions = {
-      from: "youremail@gmail.com",
-      to: "thedebugarena@gmail.com",
-      subject: "Password Reset",
-      text: link,
+    const mailOptions = {
+      from: "orangefsd@gmail.com",
+      to: req.body.email,
+      subject: "Tu cuenta ha sido creada con éxito",
+      text: "This is a test email sent using Nodemailer.",
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
