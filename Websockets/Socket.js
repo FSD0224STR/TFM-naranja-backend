@@ -12,8 +12,8 @@ const configSocket = (io) => {
       socket.join(room); // Agrego al usuario a una sala creada con un id aleatorio, para evitar repetición de salas y entren dos en la misma
       socket.myRooms.push(room); // Guardar la sala en la propiedad personalizada
       activeRooms.push(room); // Añado la sala a las disponibles para los administradores
-      console.log(`Usuario ${socket.id} se ha unido a la sala ${room}`);
-      console.log("socket.myRooms: ", socket.myRooms);
+      // console.log(`Usuario ${socket.id} se ha unido a la sala ${room}`);
+      // console.log("socket.myRooms: ", socket.myRooms);
       socket.emit("roomJoined", room);
 
       if (activeAdmins.length > 0) {
@@ -30,11 +30,11 @@ const configSocket = (io) => {
         socket.join(randomRoom); // Si hay varias salas activas el admin se añade a una aleatoriamente
         socket.myRooms.push(randomRoom); // Guardar la sala en la propiedad personalizada
         activeAdmins.push(socket.id);
-        console.log("activeRooms-admin: ", activeRooms);
-        console.log("activeAdmins-admin: ", activeAdmins);
-        console.log(
-          `Administrador ${socket.id} se ha unido a la sala RANDOM ${randomRoom}`
-        );
+        // console.log("activeRooms-admin: ", activeRooms);
+        // console.log("activeAdmins-admin: ", activeAdmins);
+        // console.log(
+        //   `Administrador ${socket.id} se ha unido a la sala RANDOM ${randomRoom}`
+        // );
 
         socket.emit("adminRoomJoined", randomRoom);
         io.to(randomRoom).emit("adminConnect", {
@@ -42,7 +42,7 @@ const configSocket = (io) => {
         });
       } else {
         activeAdmins.push(socket.id); //Si no hay salas activas coloco al admin como disponible y a la espera de conexion de un usuario
-        console.log("No hay salas activas disponibles");
+        // console.log("No hay salas activas disponibles");
         socket.emit("adminRoomJoined", {
           msg: "No hay salas activas disponibles",
         });
@@ -52,9 +52,9 @@ const configSocket = (io) => {
     socket.on("adminJoinRoom", (room) => {
       socket.join(room); // Agrego al admin a la nueva sala que abre el usuario
       socket.myRooms.push(room);
-      console.log(
-        `Administrador ${socket.id} se ha unido a la nueva sala ${room}`
-      );
+      // console.log(
+      //   `Administrador ${socket.id} se ha unido a la nueva sala ${room}`
+      // );
 
       socket.emit("adminRoomJoined", room);
       io.to(room).emit("adminConnect", {
@@ -73,28 +73,28 @@ const configSocket = (io) => {
 
     socket.on("userDisconnect", ({ room, typeUser }) => {
       if (typeUser === "Admin") {
-        console.log(`Administrador ${socket.id} ha salida de la sala ${room}`);
+        // console.log(`Administrador ${socket.id} ha salida de la sala ${room}`);
         io.to(room).emit("userDisconnect", {
           msg: "Administrador desconectado",
           typeUser,
         });
         activeAdmins = activeAdmins.filter((adminId) => adminId !== socket.id); // Elimina al admin de disponibles si se desconecta
       } else {
-        console.log(
-          `Usuario ${socket.id} desconectado. La sala ${room} será cerrada.`
-        );
+        // console.log(
+        //   `Usuario ${socket.id} desconectado. La sala ${room} será cerrada.`
+        // );
         io.to(room).emit("userDisconnect", {
           msg: "Usuario desconectado. La sala será cerrada.",
           typeUser,
         }); // Si el usuario se desconecta la sala se queda como inactiva y se borra de las disponibles
         activeRooms = activeRooms.filter((r) => r !== room);
       }
-      console.log("activeRooms-deslog: ", activeRooms);
-      console.log("activeAdmins-deslog: ", activeAdmins);
+      // console.log("activeRooms-deslog: ", activeRooms);
+      // console.log("activeAdmins-deslog: ", activeAdmins);
     });
 
     socket.on("disconnect", () => {
-      console.log("Cliente desconectado");
+      // console.log("Cliente desconectado");
 
       activeAdmins = activeAdmins.filter((adminId) => adminId !== socket.id); // Elimina al admin de disponibles si se desconecta
 
@@ -104,10 +104,10 @@ const configSocket = (io) => {
           typeUser: "User",
         });
         activeRooms = activeRooms.filter((r) => r !== room); // Si el usuario se desconecta la sala se queda como inactiva y se borra de las disponibles
-        console.log(`La sala ${room} ha sido eliminada`);
+        // console.log(`La sala ${room} ha sido eliminada`);
       });
-      console.log("activeRooms-disc: ", activeRooms);
-      console.log("activeAdmins-disc: ", activeAdmins);
+      // console.log("activeRooms-disc: ", activeRooms);
+      // console.log("activeAdmins-disc: ", activeAdmins);
     });
   });
 };
