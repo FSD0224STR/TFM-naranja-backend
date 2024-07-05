@@ -7,6 +7,7 @@ const {
   isAdmin,
   deleteUser,
   updateUser,
+  verifyAdmin,
   forgotPass,
   resetPass,
   mailResetPass,
@@ -16,6 +17,7 @@ const UsersRouter = express.Router();
 UsersRouter.post("/forgot", forgotPass);
 UsersRouter.post("/register", registerUser);
 UsersRouter.post("/login", loginUser);
+UsersRouter.post("/verifyAdmin", verifyAdmin);
 UsersRouter.post("/reset-password/:id/:token", mailResetPass);
 UsersRouter.get("/reset-password/:id/:token", resetPass);
 

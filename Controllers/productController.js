@@ -43,13 +43,10 @@ const findProducts = async (req, res) => {
       });
     }
 
-    console.log(products);
-
     if (products.length === 0) {
       return res.status(404).json({ error: "Products not found" });
     }
 
-    console.log("que es esto3");
     res.status(200).json({ data: products });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -70,13 +67,22 @@ const findProductById = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  const { product, description, price, origin, brand, allergens, ingredients } =
-    req.body;
+  const {
+    product,
+    description,
+    price,
+    category,
+    origin,
+    brand,
+    allergens,
+    ingredients,
+  } = req.body;
 
   if (
     !product ||
     !description ||
     !price ||
+    !category ||
     !origin ||
     !brand ||
     !allergens ||
@@ -86,8 +92,19 @@ const addProduct = async (req, res) => {
   }
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(category)) {
+      return res.status(400).json({ error: "Invalid category ID" });
+    }
+
     const newProduct = await productModel.create({
-      ...req.body,
+      product,
+      description,
+      price,
+      category: new mongoose.Types.ObjectId(category),
+      origin,
+      brand,
+      allergens,
+      ingredients,
     });
 
     res.status(201).json({ data: "Product created", id: newProduct._id });
@@ -148,17 +165,20 @@ const deleteProduct = async (req, res) => {
 const findProductsByCategory = async (req, res) => {
   try {
     const targetCategory = req.params.category;
+    console.log("request de category", targetCategory);
 
-    const result = (await productModel.populate("Category"))
+    const result = await productModel
       .find({
-        category: { category: targetCategory },
+        category: targetCategory,
       })
-      .sort({ createdAt: -1 });
-    res.json(result);
+      .populate("category")
+      .sort({ createAt: -1 })
+      .exec();
+    console.log("request de result", result);
+
+    res.status(200).json({ data: result });
   } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 

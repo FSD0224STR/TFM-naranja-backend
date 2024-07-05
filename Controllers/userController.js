@@ -52,15 +52,13 @@ const isAdmin = (req, res, next) => {
 
 const registerUser = async (req, res) => {
   try {
-    console.log("back", req.body.email);
-    /*     const tokenSecret = crypto.randomBytes(32).toString("hex"); */
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
-    console.log("back", hashedPassword);
 
     const newUser = await userModel.create({
       email: req.body.email,
       password: hashedPassword,
       secret: tokenSecret,
+      isAdmin: false,
     });
 
     console.log("back", req.body.password);
@@ -200,6 +198,18 @@ const updateUser = async (req, res) => {
   }
 };
 
+const verifyAdmin = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const userFound = await userModel.findOne({ email: email });
+    if (!userFound) return res.status(404).json("User not found");
+
+    res.status(200).json(userFound.isAdmin);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const forgotPass = async (req, res) => {
   const { email } = req.body;
   try {
@@ -285,6 +295,7 @@ module.exports = {
   isAdmin,
   deleteUser,
   updateUser,
+  verifyAdmin,
   forgotPass,
   resetPass,
   mailResetPass,
