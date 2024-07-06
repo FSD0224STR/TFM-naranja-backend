@@ -29,9 +29,9 @@ ProductsRouter.get("/ingredients", findIngredients);
 ProductsRouter.get("/", findAllProduct);
 ProductsRouter.get("/search", findProducts);
 ProductsRouter.post("/", addProduct);
-ProductsRouter.put("/:id", updateProduct);
+ProductsRouter.put("/:slug", updateProduct);
 ProductsRouter.delete("/:id", deleteProduct);
-ProductsRouter.get("/:id", findProductById);
+ProductsRouter.get("/:slug", findProductById);
 
 module.exports = {
   ProductsRouter,
