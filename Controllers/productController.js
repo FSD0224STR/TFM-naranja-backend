@@ -57,17 +57,10 @@ const findProducts = async (req, res) => {
 
 const findProductById = async (req, res) => {
   const { slug } = req.params;
-  // const { id } = req.params;
-  try {
-    // const product = await productModel.findOne({ slug: slug });
-    // // const product = await productModel.findById(id);
-    // if (product.length === 0) {
-    //   return res.status(404).json({ error: "Product not found" });
-    // }
-    // const categoryName = await categoryModel.findById(product.category);
-    // const productOk = { ...product, category: categoryName.category };
 
-    const product = await productModel.findOne({ slug: slug }).lean(); // Con el metodo lean() devolvemos un objeto plano
+  try {
+    // Con el metodo lean() devolvemos un objeto plano
+    const product = await productModel.findOne({ slug: slug }).lean();
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -140,15 +133,10 @@ const addProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const { slug } = req.params;
-  // const { id } = req.params;
-
-  // if (!mongoose.Types.ObjectId.isValid(id)) {
-  //   return res.status(400).json({ error: "Invalid product ID" });
-  // }
+  let product;
 
   try {
-    const product = await productModel.findOne({ slug: slug });
-    // const product = await productModel.findById(id);
+    product = await productModel.findOne({ slug: slug }).lean();
     if (product.length === 0) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -156,9 +144,10 @@ const updateProduct = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 
+  req.body.category = product.category;
+
   try {
     await productModel.findOneAndUpdate({ slug: slug }, req.body);
-    // await productModel.findByIdAndUpdate(id, req.body);
 
     res.status(200).json({ data: "Product updated" });
   } catch (error) {
@@ -168,15 +157,9 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   const { slug } = req.params;
-  // const { id } = req.params;
-
-  // if (!mongoose.Types.ObjectId.isValid(id)) {
-  //   return res.status(400).json({ error: "Invalid product ID" });
-  // }
 
   try {
     const product = await productModel.findOne({ slug: slug });
-    // const product = await productModel.findById(id);
     if (product.length === 0) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -186,7 +169,6 @@ const deleteProduct = async (req, res) => {
 
   try {
     await productModel.findOneAndDelete({ slug: slug });
-    // await productModel.findByIdAndDelete(id);
     res.status(200).json({ data: "Product removed successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -194,18 +176,25 @@ const deleteProduct = async (req, res) => {
 };
 
 const findProductsByCategory = async (req, res) => {
-  try {
-    const targetCategory = req.params.category;
+  const { category } = req.params;
 
-    const result = await productModel
+  try {
+    const categoryName = await categoryModel
+      .findOne({ category: category })
+      .lean();
+    if (!categoryName) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    const products = await productModel
       .find({
-        category: targetCategory,
+        category: categoryName._id,
       })
       .populate("category")
       .sort({ createAt: -1 })
-      .exec();
+      .lean();
 
-    res.status(200).json({ data: result });
+    res.status(200).json({ data: products });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

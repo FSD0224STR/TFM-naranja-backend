@@ -30,7 +30,7 @@ ProductsRouter.get("/", findAllProduct);
 ProductsRouter.get("/search", findProducts);
 ProductsRouter.post("/", addProduct);
 ProductsRouter.put("/:slug", updateProduct);
-ProductsRouter.delete("/:id", deleteProduct);
+ProductsRouter.delete("/:slug", deleteProduct);
 ProductsRouter.get("/:slug", findProductById);
 
 module.exports = {
