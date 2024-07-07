@@ -12,7 +12,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_APP_PASS,
   },
 });
-/* const crypto = require("crypto"); */
 
 const tokenSecret = process.env.TOKEN_SECRET;
 
@@ -55,13 +54,14 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 12);
 
     const newUser = await userModel.create({
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
       email: req.body.email,
       password: hashedPassword,
       secret: tokenSecret,
       isAdmin: false,
     });
 
-    console.log("back", req.body.password);
     //send confirmation email
     const mailOptions = {
       from: "orangefsd@gmail.com",
@@ -198,13 +198,13 @@ const updateUser = async (req, res) => {
   }
 };
 
-const verifyAdmin = async (req, res) => {
+const getDataUser = async (req, res) => {
   const { email } = req.body;
   try {
     const userFound = await userModel.findOne({ email: email });
     if (!userFound) return res.status(404).json("User not found");
 
-    res.status(200).json(userFound.isAdmin);
+    res.status(200).json({ data: userFound });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -295,7 +295,7 @@ module.exports = {
   isAdmin,
   deleteUser,
   updateUser,
-  verifyAdmin,
+  getDataUser,
   forgotPass,
   resetPass,
   mailResetPass,
