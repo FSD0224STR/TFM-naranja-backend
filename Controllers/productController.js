@@ -17,6 +17,38 @@ const findAllProduct = async (req, res) => {
   }
 };
 
+const getSuggestions = async (req, res) => {
+  try {
+    const { query, category } = req.query;
+
+    if (!query) {
+      return res.status(400).json({ error: "Query is required" });
+    }
+
+    const sanitizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    const regex = new RegExp(`\\b${sanitizedQuery}\\b`, "i");
+
+    const searchCriteria = category ? 
+      { $and: [{ category: { $regex: new RegExp(`^${category}$`, 'i') } }, { product: { $regex: regex } }] } :
+      { product: { $regex: regex } };
+
+    const products = await productModel.find(searchCriteria);
+
+    const suggestions = products.map(product => ({
+      name: product.product,
+      category: product.category,
+    }));
+
+    res.status(200).json(suggestions);
+  } catch (error) {
+    console.error('Error fetching suggestions:', error);
+    res.status(500).json({ error: 'Error fetching suggestions' });
+  }
+};
+
+
+
 const findProducts = async (req, res) => {
   try {
     const searchTerm = req.query.searchTerm;
@@ -25,36 +57,27 @@ const findProducts = async (req, res) => {
       return res.status(400).json({ error: "Search term is required" });
     }
 
-    const isNumeric = !isNaN(searchTerm);
-    const regex = new RegExp(`\\b${searchTerm}\\b`, "i");
+    const sanitizedTerm = searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    if (isNumeric) {
-      products = await productModel.find({ price: searchTerm });
-    } else {
-      products = await productModel.find({
-        $or: [
-          { description: regex },
-          { product: regex },
-          { brand: regex },
-          { origin: regex },
-          { allergens: { $elemMatch: { $regex: regex } } },
-          { ingredients: { $elemMatch: { $regex: regex } } },
-        ],
-      });
-    }
+    const regex = new RegExp(`\\b${sanitizedTerm}\\b`, "i");
 
-    console.log(products);
+    const products = await productModel.find({
+      $or: [
+        { product: { $regex: regex } },
+      ],
+    });
 
     if (products.length === 0) {
-      return res.status(404).json({ error: "Products not found" });
+      return res.status(404).json({ error: `No se encontraron productos para "${searchTerm}"` });
     }
 
-    console.log("que es esto3");
     res.status(200).json({ data: products });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 const findProductById = async (req, res) => {
   const { id } = req.params;
@@ -242,4 +265,5 @@ module.exports = {
   findIngredients,
   findProduct,
   findBrand,
+  getSuggestions
 };
