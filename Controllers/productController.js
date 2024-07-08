@@ -86,6 +86,7 @@ const addProduct = async (req, res) => {
     brand,
     allergens,
     ingredients,
+    user,
   } = req.body;
 
   if (
@@ -96,7 +97,8 @@ const addProduct = async (req, res) => {
     !origin ||
     !brand ||
     !allergens ||
-    !ingredients
+    !ingredients ||
+    !user
   ) {
     return res.status(400).json({ error: "You missed parameter" });
   }
@@ -104,6 +106,10 @@ const addProduct = async (req, res) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(category)) {
       return res.status(400).json({ error: "Invalid category ID" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(user)) {
+      return res.status(400).json({ error: "Invalid user ID" });
     }
 
     const slug = slugify(product, {
@@ -123,6 +129,7 @@ const addProduct = async (req, res) => {
       allergens,
       ingredients,
       slug,
+      user: new mongoose.Types.ObjectId(user),
     });
 
     res.status(201).json({ data: "Product created", id: newProduct._id });
