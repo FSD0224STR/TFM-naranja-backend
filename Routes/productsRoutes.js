@@ -12,6 +12,7 @@ const {
   findAllergens,
   findIngredients,
   findBrand,
+  getSuggestions,
 } = require("../Controllers/productController");
 
 const { verifyToken } = require("../Controllers/userController");
@@ -28,10 +29,11 @@ ProductsRouter.get("/allergens", findAllergens);
 ProductsRouter.get("/ingredients", findIngredients);
 ProductsRouter.get("/", findAllProduct);
 ProductsRouter.get("/search", findProducts);
+ProductsRouter.get("/suggestions", getSuggestions);
 ProductsRouter.post("/", addProduct);
-ProductsRouter.put("/:id", updateProduct);
-ProductsRouter.delete("/:id", deleteProduct);
-ProductsRouter.get("/:id", findProductById);
+ProductsRouter.put("/:slug", updateProduct);
+ProductsRouter.delete("/:slug", deleteProduct);
+ProductsRouter.get("/:slug", findProductById);
 
 module.exports = {
   ProductsRouter,
