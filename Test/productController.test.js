@@ -14,10 +14,6 @@ describe("Product Controller", () => {
   res.json = jest.fn();
   res.status = jest.fn(() => res);
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it("findProduct returns product list", async () => {
     // mock de productModel para que find devuelva un array de productos mock
     const findSpy = jest

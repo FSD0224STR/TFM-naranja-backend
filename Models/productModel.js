@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const productSchema = new mongoose.Schema(
   {
     product: String,
-    category: { type: mongoose.Schema.Types.String, ref: "Category" },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
     description: String,
     price: Number,
     origin: String,
@@ -11,6 +11,12 @@ const productSchema = new mongoose.Schema(
     allergens: Array,
     ingredients: Array,
     images: Array,
+    slug: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

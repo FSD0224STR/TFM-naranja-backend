@@ -4,6 +4,8 @@ const { ingredientsModel } = require("../Models/ingredientsModel");
 const { originModel } = require("../Models/originModel");
 const mongoose = require("mongoose");
 const { brandModel } = require("../Models/brandModel");
+const { categoryModel } = require("../Models/categoryModel");
+const slugify = require("slugify");
 
 const findAllProduct = async (req, res) => {
   try {
@@ -80,12 +82,20 @@ const findProducts = async (req, res) => {
 
 
 const findProductById = async (req, res) => {
-  const { id } = req.params;
+  const { slug } = req.params;
+
   try {
-    const product = await productModel.findById(id);
-    if (product.length === 0) {
+    // Con el metodo lean() devolvemos un objeto plano
+    const product = await productModel.findOne({ slug: slug }).lean();
+    if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
+
+    const category = await categoryModel.findById(product.category).lean();
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+    product.category = category.category;
     res.status(200).json({ data: product });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -93,24 +103,59 @@ const findProductById = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  const { product, description, price, origin, brand, allergens, ingredients } =
-    req.body;
+  const {
+    product,
+    description,
+    price,
+    category,
+    origin,
+    brand,
+    allergens,
+    ingredients,
+    user,
+  } = req.body;
 
   if (
     !product ||
     !description ||
     !price ||
+    !category ||
     !origin ||
     !brand ||
     !allergens ||
-    !ingredients
+    !ingredients ||
+    !user
   ) {
     return res.status(400).json({ error: "You missed parameter" });
   }
 
   try {
+    if (!mongoose.Types.ObjectId.isValid(category)) {
+      return res.status(400).json({ error: "Invalid category ID" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(user)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    const slug = slugify(product, {
+      lower: true,
+      strict: true,
+      replacement: "-",
+      trim: true,
+    });
+
     const newProduct = await productModel.create({
-      ...req.body,
+      product,
+      description,
+      price,
+      category: new mongoose.Types.ObjectId(category),
+      origin,
+      brand,
+      allergens,
+      ingredients,
+      slug,
+      user: new mongoose.Types.ObjectId(user),
     });
 
     res.status(201).json({ data: "Product created", id: newProduct._id });
@@ -120,14 +165,11 @@ const addProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid product ID" });
-  }
+  const { slug } = req.params;
+  let product;
 
   try {
-    const product = await productModel.findById(id);
+    product = await productModel.findOne({ slug: slug }).lean();
     if (product.length === 0) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -135,8 +177,10 @@ const updateProduct = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 
+  req.body.category = product.category;
+
   try {
-    await productModel.findByIdAndUpdate(id, req.body);
+    await productModel.findOneAndUpdate({ slug: slug }, req.body);
 
     res.status(200).json({ data: "Product updated" });
   } catch (error) {
@@ -145,14 +189,10 @@ const updateProduct = async (req, res) => {
 };
 
 const deleteProduct = async (req, res) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(400).json({ error: "Invalid product ID" });
-  }
+  const { slug } = req.params;
 
   try {
-    const product = await productModel.findById(id);
+    const product = await productModel.findOne({ slug: slug });
     if (product.length === 0) {
       return res.status(404).json({ error: "Product not found" });
     }
@@ -161,7 +201,7 @@ const deleteProduct = async (req, res) => {
   }
 
   try {
-    await productModel.findByIdAndDelete(id);
+    await productModel.findOneAndDelete({ slug: slug });
     res.status(200).json({ data: "Product removed successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -169,19 +209,27 @@ const deleteProduct = async (req, res) => {
 };
 
 const findProductsByCategory = async (req, res) => {
-  try {
-    const targetCategory = req.params.category;
+  const { category } = req.params;
 
-    const result = (await productModel.populate("Category"))
+  try {
+    const categoryName = await categoryModel
+      .findOne({ category: category })
+      .lean();
+    if (!categoryName) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    const products = await productModel
       .find({
-        category: { category: targetCategory },
+        category: categoryName._id,
       })
-      .sort({ createdAt: -1 });
-    res.json(result);
+      .populate("category")
+      .sort({ createAt: -1 })
+      .lean();
+
+    res.status(200).json({ data: products });
   } catch (error) {
-    return res
-      .status(403)
-      .json({ error: "Token verification failed: " + error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
