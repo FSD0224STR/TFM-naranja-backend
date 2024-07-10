@@ -48,9 +48,26 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-const isAdmin = (req, res, next) => {
-  if (req.user.role === "admin") return next();
-  res.status(400).json("No estas autorizado para ver este recurso");
+const verifyAdminUsers = async (req, res, next) => {
+  const { user } = req.body;
+  const { email } = req.user;
+
+  try {
+    const userFound = await userModel.findOne({ email: email });
+    if (!userFound) return res.status(404).json("User not found");
+
+    console.log("userFound._id: ", userFound._id);
+
+    if (userFound.isAdmin || userFound._id === user) {
+      next();
+    } else {
+      return res
+        .status(403)
+        .json({ error: "No estas autorizado para acceder a este recurso" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const registerUser = async (req, res) => {
@@ -296,7 +313,7 @@ module.exports = {
   loginUser,
   registerUser,
   verifyToken,
-  isAdmin,
+  verifyAdminUsers,
   deleteUser,
   updateUser,
   getDataUser,

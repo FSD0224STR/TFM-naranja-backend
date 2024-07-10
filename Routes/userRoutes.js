@@ -4,7 +4,7 @@ const {
   loginUser,
   verifyToken,
   registerUser,
-  isAdmin,
+  verifyAdminUsers,
   deleteUser,
   updateUser,
   getDataUser,
@@ -26,9 +26,8 @@ UsersRouter.post("/getDataUser", getDataUser);
 //UsersRouter.delete("/:user_id", isAdmin, deleteUser);
 //UsersRouter.post("/forgot", isAdmin, forgotUser);
 //UsersRouter.get("/:user_id", showDashboard);
-UsersRouter.put("/:id", updateUser);
-UsersRouter.delete("/:user_id", isAdmin, deleteUser);
-UsersRouter.put("/:user_id", updateUser);
+UsersRouter.put("/:id", verifyAdminUsers, updateUser);
+UsersRouter.delete("/:id", verifyAdminUsers, deleteUser);
 
 module.exports = {
   UsersRouter,
