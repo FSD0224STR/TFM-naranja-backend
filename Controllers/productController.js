@@ -27,29 +27,35 @@ const getSuggestions = async (req, res) => {
       return res.status(400).json({ error: "Query is required" });
     }
 
-    const sanitizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const sanitizedQuery = query
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
 
     const regex = new RegExp(`\\b${sanitizedQuery}\\b`, "i");
 
-    const searchCriteria = category ? 
-      { $and: [{ category: { $regex: new RegExp(`^${category}$`, 'i') } }, { product: { $regex: regex } }] } :
-      { product: { $regex: regex } };
+    const searchCriteria = category
+      ? {
+          $and: [
+            { category: { $regex: new RegExp(`^${category}$`, "i") } },
+            { product: { $regex: regex } },
+          ],
+        }
+      : { product: { $regex: regex } };
 
     const products = await productModel.find(searchCriteria);
 
-    const suggestions = products.map(product => ({
+    const suggestions = products.map((product) => ({
       name: product.product,
       category: product.category,
     }));
 
     res.status(200).json(suggestions);
   } catch (error) {
-    console.error('Error fetching suggestions:', error);
-    res.status(500).json({ error: 'Error fetching suggestions' });
+    console.error("Error fetching suggestions:", error);
+    res.status(500).json({ error: "Error fetching suggestions" });
   }
 };
-
-
 
 const findProducts = async (req, res) => {
   try {
@@ -59,18 +65,21 @@ const findProducts = async (req, res) => {
       return res.status(400).json({ error: "Search term is required" });
     }
 
-    const sanitizedTerm = searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const sanitizedTerm = searchTerm
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
 
     const regex = new RegExp(`\\b${sanitizedTerm}\\b`, "i");
 
     const products = await productModel.find({
-      $or: [
-        { product: { $regex: regex } },
-      ],
+      $or: [{ product: { $regex: regex } }],
     });
 
     if (products.length === 0) {
-      return res.status(404).json({ error: `No se encontraron productos para "${searchTerm}"` });
+      return res
+        .status(404)
+        .json({ error: `No se encontraron productos para "${searchTerm}"` });
     }
 
     res.status(200).json({ data: products });
@@ -78,8 +87,6 @@ const findProducts = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 const findProductById = async (req, res) => {
   const { slug } = req.params;
@@ -112,8 +119,12 @@ const addProduct = async (req, res) => {
     brand,
     allergens,
     ingredients,
+    images,
     user,
   } = req.body;
+
+  console.log("images: ", images);
+  console.log("user: ", user);
 
   if (
     !product ||
@@ -124,6 +135,7 @@ const addProduct = async (req, res) => {
     !brand ||
     !allergens ||
     !ingredients ||
+    !images ||
     !user
   ) {
     return res.status(400).json({ error: "You missed parameter" });
@@ -154,6 +166,7 @@ const addProduct = async (req, res) => {
       brand,
       allergens,
       ingredients,
+      images,
       slug,
       user: new mongoose.Types.ObjectId(user),
     });
@@ -300,6 +313,21 @@ const findBrand = async (req, res) => {
   }
 };
 
+const getFilterProducts = async (req, res) => {
+  try {
+    const { name, category, minPrice, maxPrice } = req.query;
+    let query = {};
+    if (name) query.name = name;
+    if (category) query.category = category;
+    if (minPrice) query.price = { $gte: minPrice };
+    if (maxPrice) query.price = { $lte: maxPrice };
+    const products = await Product.find(query);
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   findAllProduct,
   findProducts,
@@ -313,5 +341,5 @@ module.exports = {
   findIngredients,
   findProduct,
   findBrand,
-  getSuggestions
+  getSuggestions,
 };
