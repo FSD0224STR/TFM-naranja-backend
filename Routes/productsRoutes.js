@@ -13,6 +13,7 @@ const {
   findIngredients,
   findBrand,
   getSuggestions,
+  getFilterProducts,
 } = require("../Controllers/productController");
 
 const {
@@ -30,6 +31,7 @@ ProductsRouter.get("/brand", findBrand);
 ProductsRouter.get("/origin", findOrigin);
 ProductsRouter.get("/allergens", findAllergens);
 ProductsRouter.get("/ingredients", findIngredients);
+ProductsRouter.get("/filters", getFilterProducts);
 ProductsRouter.get("/", findAllProduct);
 ProductsRouter.get("/search", findProducts);
 ProductsRouter.get("/suggestions", getSuggestions);

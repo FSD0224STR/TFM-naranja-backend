@@ -123,9 +123,6 @@ const addProduct = async (req, res) => {
     user,
   } = req.body;
 
-  console.log("images: ", images);
-  console.log("user: ", user);
-
   if (
     !product ||
     !description ||
@@ -315,14 +312,31 @@ const findBrand = async (req, res) => {
 
 const getFilterProducts = async (req, res) => {
   try {
-    const { name, category, minPrice, maxPrice } = req.query;
+    const { product, category, minPrice, maxPrice } = req.query;
+
     let query = {};
-    if (name) query.name = name;
+
+    if (product) {
+      const slug = slugify(product, {
+        lower: true,
+        strict: true,
+        replacement: "-",
+        trim: true,
+      });
+      const regex = new RegExp(`\\b${slug}\\b`, "i");
+      query.slug = regex;
+    }
+
     if (category) query.category = category;
-    if (minPrice) query.price = { $gte: minPrice };
-    if (maxPrice) query.price = { $lte: maxPrice };
-    const products = await Product.find(query);
-    res.status(200).json(products);
+
+    if (minPrice || maxPrice) {
+      query.price = {};
+      if (minPrice) query.price.$gte = Number(minPrice);
+      if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    const products = await productModel.find(query);
+    res.status(200).json({ data: products });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -342,4 +356,5 @@ module.exports = {
   findProduct,
   findBrand,
   getSuggestions,
+  getFilterProducts,
 };

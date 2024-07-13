@@ -229,9 +229,7 @@ const getDataUser = async (req, res) => {
     const userFound = await userModel.findOne({ email: email });
     if (!userFound) return res.status(404).json("User not found");
 
-    userFound.lastname = "";
     userFound.password = "";
-    userFound.image = [];
 
     res.status(200).json({ data: userFound });
   } catch (error) {
