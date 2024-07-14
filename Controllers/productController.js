@@ -327,7 +327,28 @@ const getFilterProducts = async (req, res) => {
       query.slug = regex;
     }
 
-    if (category) query.category = category;
+    if (category) {
+      const isObjectId =
+        mongoose.Types.ObjectId.isValid(category) &&
+        new mongoose.Types.ObjectId(category).toString() === category;
+
+      if (isObjectId) {
+        query.category = category;
+      } else {
+        try {
+          const categoryName = await categoryModel.findOne({
+            category: category,
+          });
+          if (categoryName) {
+            query.category = categoryName._id;
+          } else {
+            return res.status(404).json({ message: "Category not found" });
+          }
+        } catch (error) {
+          return res.status(500).json({ message: error.message });
+        }
+      }
+    }
 
     if (minPrice || maxPrice) {
       query.price = {};
