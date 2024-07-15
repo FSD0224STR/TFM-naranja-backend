@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema(
     lastname: { type: String, require: true },
     email: { type: String, require: true, unique: true },
     password: { type: String, require: true },
-    birthday: { type: Date, require: false },
     isAdmin: Boolean,
+    image: String,
   },
   { timestamps: true }
 );

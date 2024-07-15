@@ -4,12 +4,13 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
 const { UsersRouter } = require("./Routes/userRoutes");
 const { ProductsRouter } = require("./Routes/productsRoutes");
 const { CategoriesRouter } = require("./Routes/categoryRoutes");
 
 const port = process.env.PORT || 3000;
-const SECRET_KEY = '6Lelgf4pAAAAAI60WioxReT7EydWWJ-4jUKkGDXH';
 
 const mongoDB =
   "mongodb+srv://" +
@@ -34,7 +35,24 @@ mongoose
 app.use(cors());
 app.use(express.json());
 
-app.use("/", ProductsRouter);
+app.get("/", (req, res) => {
+  res.send("Servidor socket.io activo");
+});
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+const { configSocket } = require("./Websockets/Socket");
+configSocket(io);
+
+module.exports = { io };
+
 app.use("/users", UsersRouter);
 app.use("/products", ProductsRouter);
 app.use("/categories", CategoriesRouter);
@@ -44,4 +62,4 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something went wrong.");
 });
 
-app.listen(port, () => console.log(`Server started on port ${port}`));
+server.listen(port, () => console.log(`Socket started on port ${port}`));

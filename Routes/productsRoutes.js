@@ -12,9 +12,14 @@ const {
   findAllergens,
   findIngredients,
   findBrand,
+  getSuggestions,
+  getFilterProducts,
 } = require("../Controllers/productController");
 
-const { verifyToken } = require("../Controllers/userController");
+const {
+  verifyToken,
+  verifyAdminUsers,
+} = require("../Controllers/userController");
 
 const ProductsRouter = express.Router();
 
@@ -26,12 +31,14 @@ ProductsRouter.get("/brand", findBrand);
 ProductsRouter.get("/origin", findOrigin);
 ProductsRouter.get("/allergens", findAllergens);
 ProductsRouter.get("/ingredients", findIngredients);
+ProductsRouter.get("/filters", getFilterProducts);
 ProductsRouter.get("/", findAllProduct);
 ProductsRouter.get("/search", findProducts);
+ProductsRouter.get("/suggestions", getSuggestions);
 ProductsRouter.post("/", addProduct);
-ProductsRouter.put("/:id", updateProduct);
-ProductsRouter.delete("/:id", deleteProduct);
-ProductsRouter.get("/:id", findProductById);
+ProductsRouter.put("/:slug", verifyAdminUsers, updateProduct);
+ProductsRouter.delete("/:slug", verifyAdminUsers, deleteProduct);
+ProductsRouter.get("/:slug", findProductById);
 
 module.exports = {
   ProductsRouter,
