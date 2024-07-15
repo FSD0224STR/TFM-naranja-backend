@@ -1,4 +1,5 @@
 const { userModel } = require("../Models/userModel");
+const { productModel } = require("../Models/productModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -24,10 +25,13 @@ const loginUser = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, userFound.password);
     if (!isPasswordValid) return res.status(401).json("Invalid password");
 
-    const token = jwt.sign({ email: userFound.email }, tokenSecret, {
-      expiresIn: "7 days",
-    });
-    res.status(200).json(token);
+    const token = jwt.sign(
+      { email: userFound.email, isAdmin: userFound.isAdmin },
+      tokenSecret,
+      { expiresIn: "7 days" }
+    );
+
+    res.status(200).json({ token, isAdmin: userFound.isAdmin });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -44,9 +48,30 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-const isAdmin = (req, res, next) => {
-  if (req.user.role === "admin") return next();
-  res.status(400).json("No estas autorizado para ver este recurso");
+const verifyAdminUsers = async (req, res, next) => {
+  const { slug } = req.params;
+  const { email } = req.user;
+
+  try {
+    const product = await productModel.findOne({ slug: slug });
+    if (!product) return res.status(404).json("Product not found");
+
+    const userFound = await userModel.findOne({ email: email });
+    if (!userFound) return res.status(404).json("User not found");
+
+    const userLogin = userFound._id.toString();
+    const userCreated = product.user.toString();
+
+    if (userFound.isAdmin || userCreated === userLogin) {
+      next();
+    } else {
+      return res
+        .status(403)
+        .json({ error: "No estas autorizado para acceder a este recurso" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const registerUser = async (req, res) => {
@@ -204,6 +229,8 @@ const getDataUser = async (req, res) => {
     const userFound = await userModel.findOne({ email: email });
     if (!userFound) return res.status(404).json("User not found");
 
+    userFound.password = "";
+
     res.status(200).json({ data: userFound });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -292,7 +319,7 @@ module.exports = {
   loginUser,
   registerUser,
   verifyToken,
-  isAdmin,
+  verifyAdminUsers,
   deleteUser,
   updateUser,
   getDataUser,
