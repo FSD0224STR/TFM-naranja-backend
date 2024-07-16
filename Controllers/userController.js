@@ -203,21 +203,20 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
+
+  let userToUpdate;
   try {
-    const userToUpdate = await userModel.findById(id);
+    userToUpdate = await userModel.findById(id);
     if (!userToUpdate) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 
   try {
     await userModel.findByIdAndUpdate(id, req.body);
-    res.json({
-      message: "Usuario actualizado correctamente",
-      user: userToUpdate,
-    });
+    return res.json({ data: "User Update" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
