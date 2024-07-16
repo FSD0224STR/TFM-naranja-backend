@@ -1,4 +1,5 @@
 const { userModel } = require("../Models/userModel");
+const { productModel } = require("../Models/productModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -25,7 +26,7 @@ const loginUser = async (req, res) => {
     if (!isPasswordValid) return res.status(401).json("Invalid password");
 
     const token = jwt.sign(
-      { email: userFound.email, isAdmin: userFound.isAdmin }, 
+      { email: userFound.email, isAdmin: userFound.isAdmin },
       tokenSecret,
       { expiresIn: "7 days" }
     );
@@ -35,7 +36,6 @@ const loginUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const verifyToken = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ")[1];
@@ -49,16 +49,20 @@ const verifyToken = async (req, res, next) => {
 };
 
 const verifyAdminUsers = async (req, res, next) => {
-  const { user } = req.body;
+  const { slug } = req.params;
   const { email } = req.user;
 
   try {
+    const product = await productModel.findOne({ slug: slug });
+    if (!product) return res.status(404).json("Product not found");
+
     const userFound = await userModel.findOne({ email: email });
     if (!userFound) return res.status(404).json("User not found");
 
-    console.log("userFound._id: ", userFound._id);
+    const userLogin = userFound._id.toString();
+    const userCreated = product.user.toString();
 
-    if (userFound.isAdmin || userFound._id === user) {
+    if (userFound.isAdmin || userCreated === userLogin) {
       next();
     } else {
       return res
@@ -199,21 +203,20 @@ const deleteUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
+
+  let userToUpdate;
   try {
-    const userToUpdate = await userModel.findById(id);
+    userToUpdate = await userModel.findById(id);
     if (!userToUpdate) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 
   try {
     await userModel.findByIdAndUpdate(id, req.body);
-    res.json({
-      message: "Usuario actualizado correctamente",
-      user: userToUpdate,
-    });
+    return res.json({ data: "User Update" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -224,6 +227,8 @@ const getDataUser = async (req, res) => {
   try {
     const userFound = await userModel.findOne({ email: email });
     if (!userFound) return res.status(404).json("User not found");
+
+    userFound.password = "";
 
     res.status(200).json({ data: userFound });
   } catch (error) {
