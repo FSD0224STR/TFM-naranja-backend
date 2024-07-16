@@ -32,6 +32,13 @@ mongoose
     console.log(err);
   });
 
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Servidor socket.io activo");
+});
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -39,13 +46,6 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
-});
-
-app.use(cors());
-app.use(express.json());
-
-app.get("/", (req, res) => {
-  res.send("Servidor socket.io activo");
 });
 
 const { configSocket } = require("./Websockets/Socket");
