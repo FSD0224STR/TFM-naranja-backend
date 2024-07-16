@@ -26,8 +26,8 @@ UsersRouter.post("/getDataUser", getDataUser);
 //UsersRouter.delete("/:user_id", isAdmin, deleteUser);
 //UsersRouter.post("/forgot", isAdmin, forgotUser);
 //UsersRouter.get("/:user_id", showDashboard);
-UsersRouter.put("/:id", verifyAdminUsers, updateUser);
-UsersRouter.delete("/:id", verifyAdminUsers, deleteUser);
+UsersRouter.put("/:id", updateUser);
+UsersRouter.delete("/:id", deleteUser);
 
 module.exports = {
   UsersRouter,
