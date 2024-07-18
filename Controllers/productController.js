@@ -21,7 +21,7 @@ const findAllProduct = async (req, res) => {
 
 const getSuggestions = async (req, res) => {
   try {
-    const { query, category } = req.query;
+    const { query } = req.query;
 
     if (!query) {
       return res.status(400).json({ error: "Query is required" });
@@ -32,16 +32,7 @@ const getSuggestions = async (req, res) => {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
 
-    const regex = new RegExp(`\\b${sanitizedQuery}\\b`, "i");
-
-    const searchCriteria = category
-      ? {
-          $and: [
-            { category: { $regex: new RegExp(`^${category}$`, "i") } },
-            { product: { $regex: regex } },
-          ],
-        }
-      : { product: { $regex: regex } };
+    const searchCriteria = { slug: { $regex: new RegExp(sanitizedQuery, 'i') } };
 
     const products = await productModel.find(searchCriteria);
 
@@ -57,24 +48,21 @@ const getSuggestions = async (req, res) => {
   }
 };
 
+
 const findProducts = async (req, res) => {
   try {
     const searchTerm = req.query.searchTerm;
+    console.log("Search term received:", searchTerm);
 
     if (!searchTerm) {
       return res.status(400).json({ error: "Search term is required" });
     }
 
-    const sanitizedTerm = searchTerm
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
+    const sanitizedTerm = searchTerm.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(' ').join('-');
+    console.log("Sanitized term (slug):", sanitizedTerm);
 
-    const regex = new RegExp(`\\b${sanitizedTerm}\\b`, "i");
-
-    const products = await productModel.find({
-      $or: [{ product: { $regex: regex } }],
-    });
+    const products = await productModel.find({ slug: sanitizedTerm });
+    console.log("Products found:", products);
 
     if (products.length === 0) {
       return res
@@ -84,9 +72,15 @@ const findProducts = async (req, res) => {
 
     res.status(200).json({ data: products });
   } catch (error) {
+    console.error('Error fetching products:', error);
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+
+
 
 const findProductById = async (req, res) => {
   const { slug } = req.params;
