@@ -50,7 +50,7 @@ const configSocket = (io) => {
         if (admin.adminId === socket.id) {
           socket.emit("adminRoomJoined", room);
           io.to(room).emit("adminConnect", {
-            msg: `${admin.firstname} Conectado`,
+            msg: `Administrador Conectado`,
           });
         }
       });
