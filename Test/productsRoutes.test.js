@@ -7,6 +7,7 @@ const { brandModel } = require("../Models/brandModel");
 // jest.mock("../Models/productModel");
 jest.mock("../Controllers/userController", () => ({
   verifyToken: (_, __, next) => next(),
+  verifyAdminUsers: (_, __, next) => next(),
 }));
 describe("Product Routes", function () {
   // iniciar app express para pruebas
@@ -23,12 +24,12 @@ describe("Product Routes", function () {
     const productMock = { _id: "1234" };
     const findSpy = jest
       .spyOn(productModel, "find")
-      .mockResolvedValueOnce([productMock]);
+      .mockReturnValueOnce({ sort: () => [productMock] });
 
     const res = await request(app).get("/");
     expect(res.header["content-type"]).toBe("application/json; charset=utf-8");
-    expect(res.statusCode).toBe(200);
     expect(res.text).toMatch('{"data":[{"_id":"1234"}]}');
+    expect(res.statusCode).toBe(200);
   });
 
   test("responds to /brand", async () => {
