@@ -68,7 +68,7 @@ const configSocket = (io) => {
     socket.on("userDisconnect", ({ room, typeUser, firstname }) => {
       if (typeUser === "Admin") {
         io.to(room).emit("userDisconnect", {
-          msg: `${firstname} desconectado`,
+          msg: `Adminstrador desconectado`,
           typeUser,
         });
         activeAdmins = activeAdmins.filter(
