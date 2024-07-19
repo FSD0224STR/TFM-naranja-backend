@@ -32,7 +32,7 @@ const configSocket = (io) => {
 
         socket.emit("adminRoomJoined", randomRoom);
         io.to(randomRoom).emit("adminConnect", {
-          msg: `${firstname} Conectado`,
+          msg: `Administrador Conectado`,
         });
       } else {
         activeAdmins.push({ adminId, firstname }); //Si no hay salas activas coloco al admin como disponible y a la espera de conexion de un usuario
