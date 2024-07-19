@@ -32,7 +32,29 @@ mongoose
     console.log(err);
   });
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://joyful-cannoli-082812.netlify.app/",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Permitir solicitudes sin origen (como las hechas por el propio servidor)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        var msg =
+          "The CORS policy for this site does not " +
+          "allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
